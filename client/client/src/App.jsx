@@ -14,7 +14,6 @@ import Dashboard from "./pages/owner/Dashboard";
 import ManageCar from "./pages/owner/ManageCar";
 import AddCard from "./pages/owner/AddCard";
 import ManageBooking from "./pages/owner/MannageBooking";
-import Login from "./component/Login";
 
 const App = () => {
   const [showLogin, setShowLogin] = useState(false);
@@ -24,8 +23,6 @@ const App = () => {
 
   return (
     <>
-    {showLogin && <Login setShowLogin={setShowLogin}/>}
-
       {/* Navbar */}
       {!isOwnerPath && <Navbar setShowLogin={setShowLogin} />}
 
