@@ -1,193 +1,235 @@
-import React, { useState } from 'react'
+import React, { useState } from 'react';
 import Title from '../../component/owner/Title';
 import { assets } from '../../assets/assets';
+import { useAppContext } from '../../context/AppContext';
+import toast from 'react-hot-toast';
+import { motion } from 'framer-motion';
 
 const AddCard = () => {
-  const currency = import.meta.env.VITE_CURRENCY
-  const onSubmitHandeler = async(e) => {
-      e.preventDefault();
-  }
+  const { axios, currency } = useAppContext();
+  
   const [image, setImage] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+  
   const [car, setCar] = useState({
-    brand:'',
-    model:'',
-    year:'',
-    pricePerDay:'',
-    category:'',
-    transmission:'',
-    fuel_type:'',
-    seating_capacity:0,
-    location:'',
-    description:''
-  })
+    brand: '',
+    model: '',
+    year: '',
+    pricePerDay: '',
+    category: '',
+    transmission: '',
+    fuel_type: '',
+    seating_capacity: '',
+    location: '',
+    description: ''
+  });
 
-  const inputClass = `
-    w-full px-4 py-3 rounded-xl border border-gray-300 bg-white text-gray-800
-    placeholder:text-gray-400 shadow-sm transition-all duration-200 outline-none
-    focus:border-primary focus:ring-4 focus:ring-primary/10 hover:border-gray-400
-  `;
-  const labelClass = "mb-2 text-sm font-semibold text-gray-700";
+  const onSubmitHandeler = async (e) => {
+    e.preventDefault();
+    if (isLoading) return;
+
+    setIsLoading(true);
+    try {
+      const formData = new FormData();
+      formData.append('image', image);
+      formData.append('carData', JSON.stringify(car));
+
+      const { data } = await axios.post('/api/owner/add-car', formData);
+
+      if (data.success) {
+        toast.success(data.message);
+        // Reset form
+        setImage(null);
+        setCar({
+          brand: '', model: '', year: '', pricePerDay: '', category: '',
+          transmission: '', fuel_type: '', seating_capacity: '',
+          location: '', description: ''
+        });
+      } else {
+        toast.error(data.message);
+      }
+    } catch (error) {
+      toast.error(error.message || "Something went wrong");
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
-    <div className='px-4 py-10 md:px-10 flex-1 bg-gray-50/50 min-h-screen'>
-      <Title title="Add new car"
-      subtitle="Fill the details to list the new car for booking including pricing, availability and car specification"/>
+    <div className="px-4 py-10 md:px-10 flex-1 bg-gray-50 min-h-screen">
+      <motion.div
+        initial={{ opacity: 0, y: 30 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8 }}
+      >
+        <Title 
+          title="Add New Car" 
+          subtitle="Fill the details to list your car for booking. Provide accurate information for better visibility." 
+        />
+      </motion.div>
 
-      <form onSubmit={onSubmitHandeler} className='mt-8 max-w-4xl bg-white border border-gray-200 rounded-2xl shadow-sm p-6 md:p-8 space-y-8'>
-
-        {/* car image */}
-        <div className='flex items-center gap-4 w-full pb-6 border-b border-gray-100'>
-          <label htmlFor="car-image" className='cursor-pointer group'>
-            <div className='h-24 w-24 rounded-xl border-2 border-dashed border-gray-300 flex items-center justify-center overflow-hidden bg-gray-50 group-hover:border-primary transition-colors duration-200'>
-              <img src={image ? URL.createObjectURL(image): assets.upload_icon} alt=""
-              className={image ? 'h-full w-full object-cover' : 'h-8 opacity-60'}/>
-            </div>
-            <input type="file" id='car-image' accept='image/*' hidden
-            onChange={e=>setImage(e.target.files[0])}/>
+      <motion.form
+        onSubmit={onSubmitHandeler}
+        initial={{ opacity: 0, y: 40 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.2, duration: 0.8 }}
+        className="mt-10 max-w-4xl mx-auto bg-white border border-gray-100 rounded-3xl shadow-xl p-8 md:p-10 space-y-10"
+      >
+        {/* Image Upload */}
+        <div className="flex flex-col md:flex-row items-center gap-6 pb-8 border-b border-gray-100">
+          <label htmlFor="car-image" className="cursor-pointer group">
+            <motion.div 
+              whileHover={{ scale: 1.03 }}
+              className="h-32 w-32 rounded-2xl border-2 border-dashed border-gray-300 flex items-center justify-center overflow-hidden bg-gray-50 group-hover:border-primary transition-all duration-300"
+            >
+              {image ? (
+                <img 
+                  src={URL.createObjectURL(image)} 
+                  alt="Car" 
+                  className="h-full w-full object-cover" 
+                />
+              ) : (
+                <div className="text-center">
+                  <img src={assets.upload_icon} alt="Upload" className="h-10 mx-auto opacity-70" />
+                  <p className="text-xs text-gray-500 mt-2">Upload Image</p>
+                </div>
+              )}
+            </motion.div>
+            <input 
+              type="file" 
+              id="car-image" 
+              accept="image/*" 
+              hidden 
+              onChange={e => setImage(e.target.files[0])} 
+            />
           </label>
+
           <div>
-            <p className='text-sm font-semibold text-gray-700'>Car image</p>
-            <p className='text-sm text-gray-500'>Upload a clear photo of your car</p>
+            <p className="text-lg font-semibold text-gray-800">Car Photo</p>
+            <p className="text-sm text-gray-500 mt-1">Upload a high-quality photo of your car (exterior recommended)</p>
           </div>
         </div>
 
-        {/* car brand and model */}
+        {/* Brand & Model */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* Brand */}
-          <div className="flex flex-col">
-            <label htmlFor="brand" className={labelClass}>Brand</label>
+          <div>
+            <label className="block mb-2 text-sm font-semibold text-gray-700">Brand</label>
             <input
-              id="brand"
               type="text"
-              placeholder="e.g. BMW, Mercedes, Audi..."
+              placeholder="e.g. BMW, Mercedes, Toyota"
               required
               value={car.brand}
               onChange={(e) => setCar({ ...car, brand: e.target.value })}
-              className={inputClass}
+              className="w-full px-5 py-4 rounded-2xl border border-gray-200 focus:border-primary focus:ring-4 focus:ring-primary/10 outline-none transition-all"
             />
           </div>
 
-          {/* Model */}
-          <div className="flex flex-col">
-            <label htmlFor="model" className={labelClass}>Model</label>
+          <div>
+            <label className="block mb-2 text-sm font-semibold text-gray-700">Model</label>
             <input
-              id="model"
               type="text"
-              placeholder="e.g. X5, E-Class, M4..."
+              placeholder="e.g. X5, C-Class, Camry"
               required
               value={car.model}
               onChange={(e) => setCar({ ...car, model: e.target.value })}
-              className={inputClass}
+              className="w-full px-5 py-4 rounded-2xl border border-gray-200 focus:border-primary focus:ring-4 focus:ring-primary/10 outline-none transition-all"
             />
           </div>
         </div>
 
-        {/* car year, price and category */}
-        <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6'>
-          <div className="flex flex-col">
-            <label htmlFor="year" className={labelClass}>Year</label>
-            <input
-              id="year"
-              type="number" placeholder="2025"
-              required value={car.year} onChange={(e) => setCar({...car, year: e.target.value })}
-              className={inputClass}
-            />
+        {/* Year, Price, Category */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+          <div>
+            <label className="block mb-2 text-sm font-semibold text-gray-700">Year</label>
+            <input type="number" placeholder="2025" required value={car.year} onChange={(e) => setCar({...car, year: e.target.value})} className="w-full px-5 py-4 rounded-2xl border border-gray-200 focus:border-primary focus:ring-4 focus:ring-primary/10 outline-none transition-all" />
           </div>
 
-          <div className="flex flex-col">
-            <label htmlFor="pricePerDay" className={labelClass}>Daily Price ({currency})</label>
-            <input
-              id="pricePerDay"
-              type="number" placeholder="100"
-              required value={car.pricePerDay} onChange={(e) => setCar({...car, pricePerDay: e.target.value })}
-              className={inputClass}
-            />
+          <div>
+            <label className="block mb-2 text-sm font-semibold text-gray-700">Daily Price ({currency})</label>
+            <input type="number" placeholder="120" required value={car.pricePerDay} onChange={(e) => setCar({...car, pricePerDay: e.target.value})} className="w-full px-5 py-4 rounded-2xl border border-gray-200 focus:border-primary focus:ring-4 focus:ring-primary/10 outline-none transition-all" />
           </div>
 
-          <div className="flex flex-col">
-            <label htmlFor="category" className={labelClass}>Category</label>
-            <select id="category" onChange={e=> setCar({...car,category:e.target.value})} value={car.category}
-              className={inputClass}>
-              <option value="">Select the Category</option>
+          <div>
+            <label className="block mb-2 text-sm font-semibold text-gray-700">Category</label>
+            <select value={car.category} onChange={(e) => setCar({...car, category: e.target.value})} required className="w-full px-5 py-4 rounded-2xl border border-gray-200 focus:border-primary focus:ring-4 focus:ring-primary/10 outline-none transition-all">
+              <option value="">Select Category</option>
               <option value="Sedan">Sedan</option>
-              <option value="Suv">Suv</option>
+              <option value="SUV">SUV</option>
               <option value="Van">Van</option>
+              <option value="Luxury">Luxury</option>
             </select>
           </div>
         </div>
 
-        {/* car transmission, fuel type, seating capacity */}
+        {/* Transmission, Fuel, Seating */}
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-          <div className="flex flex-col">
-            <label htmlFor="transmission" className={labelClass}>Transmission</label>
-            <select id="transmission" onChange={e=> setCar({...car,transmission:e.target.value})} value={car.transmission}
-              className={inputClass}>
-              <option value="">Select a transition</option>
+          <div>
+            <label className="block mb-2 text-sm font-semibold text-gray-700">Transmission</label>
+            <select value={car.transmission} onChange={(e) => setCar({...car, transmission: e.target.value})} required className="w-full px-5 py-4 rounded-2xl border border-gray-200 focus:border-primary focus:ring-4 focus:ring-primary/10 outline-none transition-all">
+              <option value="">Select Transmission</option>
               <option value="Automatic">Automatic</option>
               <option value="Manual">Manual</option>
               <option value="Semi-Automatic">Semi-Automatic</option>
             </select>
           </div>
 
-          <div className="flex flex-col">
-            <label htmlFor="fuel_type" className={labelClass}>Fuel Type</label>
-            <select id="fuel_type" onChange={e=> setCar({...car,fuel_type:e.target.value})} value={car.fuel_type}
-              className={inputClass}>
-              <option value="">Select a fuel_type</option>
-              <option value="Gas">Gas</option>
-              <option value="Diesel">Diesel</option>
+          <div>
+            <label className="block mb-2 text-sm font-semibold text-gray-700">Fuel Type</label>
+            <select value={car.fuel_type} onChange={(e) => setCar({...car, fuel_type: e.target.value})} required className="w-full px-5 py-4 rounded-2xl border border-gray-200 focus:border-primary focus:ring-4 focus:ring-primary/10 outline-none transition-all">
+              <option value="">Select Fuel Type</option>
               <option value="Petrol">Petrol</option>
+              <option value="Diesel">Diesel</option>
               <option value="Electric">Electric</option>
               <option value="Hybrid">Hybrid</option>
             </select>
           </div>
 
-          <div className="flex flex-col">
-            <label htmlFor="seating_capacity" className={labelClass}>Seating Capacity</label>
-            <input
-              id="seating_capacity"
-              type="number" placeholder="4"
-              required value={car.seating_capacity} onChange={(e) => setCar({...car, seating_capacity: e.target.value })}
-              className={inputClass}
-            />
+          <div>
+            <label className="block mb-2 text-sm font-semibold text-gray-700">Seating Capacity</label>
+            <input type="number" placeholder="5" required value={car.seating_capacity} onChange={(e) => setCar({...car, seating_capacity: e.target.value})} className="w-full px-5 py-4 rounded-2xl border border-gray-200 focus:border-primary focus:ring-4 focus:ring-primary/10 outline-none transition-all" />
           </div>
         </div>
 
-        {/* car location */}
-        <div className='flex flex-col w-full'>
-          <label htmlFor="location" className={labelClass}>Location</label>
-          <select id="location" onChange={e=> setCar({...car,location:e.target.value})} value={car.location}
-            className={inputClass}>
-            <option value="">Select a location</option>
-            <option value="ew York">New York</option>
-            <option value="Los Angles">Los Angles</option>
-            <option value="Huston">Huston</option>
-            <option value="chicago">chicago</option>
+        {/* Location */}
+        <div>
+          <label className="block mb-2 text-sm font-semibold text-gray-700">Location</label>
+          <select value={car.location} onChange={(e) => setCar({...car, location: e.target.value})} required className="w-full px-5 py-4 rounded-2xl border border-gray-200 focus:border-primary focus:ring-4 focus:ring-primary/10 outline-none transition-all">
+            <option value="">Select Location</option>
+            <option value="New York">New York</option>
+            <option value="Los Angeles">Los Angeles</option>
+            <option value="Chicago">Chicago</option>
+            <option value="Miami">Miami</option>
+            <option value="San Francisco">San Francisco</option>
           </select>
         </div>
 
-        {/* car description */}
-        <div className='flex flex-col w-full'>
-          <label htmlFor="description" className={labelClass}>Description</label>
+        {/* Description */}
+        <div>
+          <label className="block mb-2 text-sm font-semibold text-gray-700">Description</label>
           <textarea
-            id="description"
-            rows={5}
-            placeholder='A luxurios SUV with the spacious interior and a powerful engine.'
+            rows={6}
+            placeholder="Describe your car: features, condition, mileage, etc."
             required
             value={car.description}
-            onChange={e=> setCar({...car, description:e.target.value})}
-            className={inputClass}
-          ></textarea>
+            onChange={(e) => setCar({...car, description: e.target.value})}
+            className="w-full px-5 py-4 rounded-3xl border border-gray-200 focus:border-primary focus:ring-4 focus:ring-primary/10 outline-none resize-y transition-all"
+          />
         </div>
 
-        <button className='flex items-center gap-2 px-5 py-3 bg-primary text-white rounded-xl font-medium
-        w-max cursor-pointer shadow-sm hover:brightness-110 active:scale-[0.98] transition-all duration-200'>
-          <img src={assets.tick_icon} alt="" />
-          List your car
-        </button>
-      </form>
+        {/* Submit Button */}
+        <motion.button
+          whileHover={{ scale: 1.03 }}
+          whileTap={{ scale: 0.97 }}
+          type="submit"
+          disabled={isLoading}
+          className="flex items-center gap-3 px-10 py-4 bg-primary hover:bg-blue-700 text-white rounded-2xl font-semibold text-lg shadow-lg shadow-primary/30 transition-all disabled:opacity-70 w-full md:w-auto"
+        >
+          <img src={assets.tick_icon} alt="" className="h-5" />
+          {isLoading ? 'Listing Your Car...' : 'List This Car'}
+        </motion.button>
+      </motion.form>
     </div>
-  )
-}
+  );
+};
 
-export default AddCard
+export default AddCard;

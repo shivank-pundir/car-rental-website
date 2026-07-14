@@ -1,18 +1,35 @@
 import React, { useState } from "react";
-import { assets, dummyUserData, ownerMenuLinks } from "../../assets/assets";
+import { assets, ownerMenuLinks } from "../../assets/assets";
 import { NavLink, useLocation } from "react-router-dom";
+import { useAppContext } from "../../context/AppContext";
+import toast from "react-hot-toast";
 
 const SideBar = () => {
-  const user = dummyUserData;
+  const{ user, axios, fetchUser} = useAppContext();
   const location = useLocation();
   const [image, setImage] = useState(null);
 
-  const updateImage = () => {
-    if (image) {
-      user.image = URL.createObjectURL(image);
+  const updateImage = async () => {
+  try {
+    const formData = new FormData();
+    formData.append("image", image);
+
+    const { data } = await axios.post("/api/owner/update-image", formData);
+
+    console.log(data);
+
+    if (data.success) {
+      await fetchUser();
+      toast.success(data.message);
       setImage(null);
+    } else {
+      toast.error(data.message);
     }
-  };
+  } catch (error) {
+    console.log(error.response);
+    toast.error(error.message);
+  }
+};
 
   return (
     <div className="relative min-h-screen md:flex flex-col items-center pt-8 max-w-16 md:max-w-60 w-full border-r border-borderColor text-sm">

@@ -15,19 +15,24 @@ import ManageCar from "./pages/owner/ManageCar";
 import AddCard from "./pages/owner/AddCard";
 import ManageBooking from "./pages/owner/MannageBooking";
 import Login from "./component/Login";
+import { Toaster } from "react-hot-toast";
+import { useAppContext } from "./context/AppContext";
 
 const App = () => {
-  const [showLogin, setShowLogin] = useState(false);
+
+  
 
   const location = useLocation();
   const isOwnerPath = location.pathname.startsWith("/owner");
+  const {showLogin} = useAppContext()
 
   return (
     <>
-    {showLogin && <Login setShowLogin={setShowLogin}/>}
+    <Toaster />
+    {showLogin && <Login/>}
 
       {/* Navbar */}
-      {!isOwnerPath && <Navbar setShowLogin={setShowLogin} />}
+      {!isOwnerPath && <Navbar />}
 
       {/* Routes */}
       <Routes>
