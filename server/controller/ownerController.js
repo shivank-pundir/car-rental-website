@@ -9,6 +9,7 @@ import Booking from "../model/booking.js";
 //Api to change role to user
 export const changeRoleToOwner = async (req, res) => {
   try {
+    console.log("Button clicked");
     const { _id } = req.user;
     await User.findByIdAndUpdate(_id, { role: "owner" });
     res.json({ success: true, message: " Now you can list you cars" });
@@ -99,9 +100,12 @@ export const toggleCarAvalbility = async (req, res) => {
     const car = await Car.findById(carId);
 
     //checking car belongs to the user
-    if (car.owner.toString() != _id.toString()) {
-      res.json({ success: false, message: "Unauthorized" });
-    }
+    if (car.owner.toString() !== _id.toString()) {
+  return res.json({
+    success: false,
+    message: "Unauthorized",
+  });
+}
     car.isAvailable = !car.isAvailable;
     await car.save();
 
@@ -128,7 +132,7 @@ export const deleteCar = async (req, res) => {
     }
     car.owner = null;
     car.isAvailable = false;
-    car.save();
+    await car.save();
     res.json({ success: true, message:"delete car owner successfully"});
   } catch (error) {
     console.log(error);
@@ -145,7 +149,7 @@ export const getDashboardData = async (req, res) => {
   try {
    const {_id, role} = req.user;
 
-   if(rolen !== 'owner'){
+   if(role !== 'owner'){
     console.log(error.message);
     res.json({success:true, message:"Unauthorized"});
    }
@@ -180,11 +184,10 @@ export const getDashboardData = async (req, res) => {
 
 
 //api to update user image
-export const updateUserImage = async(req, res) => {
+export const updateUserImage = async (req, res) => {
   try {
     const { _id } = req.user;
 
-    const car = JSON.parse(req.body.carData);
     const imageFile = req.file;
 
     if (!imageFile) {
@@ -194,9 +197,10 @@ export const updateUserImage = async(req, res) => {
       });
     }
 
-    // Upload image to ImageKit
+    // Read uploaded file
     const fileBuffer = fs.readFileSync(imageFile.path);
 
+    // Upload to ImageKit
     const response = await imagekit.upload({
       file: fileBuffer,
       fileName: imageFile.originalname,
@@ -206,8 +210,8 @@ export const updateUserImage = async(req, res) => {
     // Delete local file
     fs.unlinkSync(imageFile.path);
 
-    // Optimized ImageKit URL
-    const optimizedImageUrl = imagekit.url({
+    // Generate optimized ImageKit URL
+    const image = imagekit.url({
       path: response.filePath,
       transformation: [
         {
@@ -217,15 +221,21 @@ export const updateUserImage = async(req, res) => {
         },
       ],
     });
-    const image = optimizedImageUrl;
-    await User.findByIdAndUpdate(_id, {image});
-    res.json({success: true, message:"image updated"})
 
+    // Update user image
+    await User.findByIdAndUpdate(_id, { image });
+
+    return res.status(200).json({
+      success: true,
+      message: "Profile image updated successfully.",
+      image,
+    });
   } catch (error) {
-    console.log(error);
-    res.status(500).json({
+    console.error("Update User Image Error:", error);
+
+    return res.status(500).json({
       success: false,
       message: error.message,
     });
   }
-}
+};

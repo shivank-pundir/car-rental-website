@@ -6,7 +6,7 @@ import upload from '../configs/multer.js';
 
 const ownerRourter = express.Router();
 
-ownerRourter.post('/changeRole',protect,changeRoleToOwner);
+ownerRourter.post('/change-role',protect,changeRoleToOwner);
 ownerRourter.post('/add-car',upload.single("image"), protect, addCar);
 ownerRourter.post('/toogle-car',protect, toggleCarAvalbility);
 ownerRourter.get('/cars',protect,getOwnerCar);
