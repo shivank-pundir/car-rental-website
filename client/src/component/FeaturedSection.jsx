@@ -1,7 +1,7 @@
 import React from 'react';
 import Title from './Title.jsx';
 import { assets } from '../assets/assets';
-import CarCard from './carCard.jsx';
+import CarCard from './CarCard.jsx'
 import { useNavigate } from 'react-router-dom';
 import { useAppContext } from '../context/AppContext.jsx';
 import { motion } from 'framer-motion';
