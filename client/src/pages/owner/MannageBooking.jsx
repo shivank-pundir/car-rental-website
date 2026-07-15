@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
-import Title from "../../component/owner/Title";
-import { useAppContext } from "../../context/AppContext";
+import Title from "../../component/owner/Title.jsx";
+import { useAppContext } from "../../context/AppContext.jsx";
 import toast from "react-hot-toast";
 import { motion } from "framer-motion";
 

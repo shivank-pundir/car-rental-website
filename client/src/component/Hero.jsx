@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { assets, cityList } from "../assets/assets";
-import { useAppContext } from "../context/AppContext";
+import { useAppContext } from "../context/AppContext.jsx";
 import { useNavigate } from "react-router-dom";
 import {motion} from 'motion/react'
 

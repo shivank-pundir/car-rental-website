@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import Title from '../../component/owner/Title';
+import Title from '../../component/owner/Title.jsx';
 import { assets } from '../../assets/assets';
-import { useAppContext } from '../../context/AppContext';
+import { useAppContext } from '../../context/AppContext.jsx';
 import toast from 'react-hot-toast';
 import { motion } from 'framer-motion';
 

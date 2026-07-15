@@ -3,7 +3,7 @@ import Title from './Title';
 import { assets } from '../assets/assets';
 import CarCard from './carCard';
 import { useNavigate } from 'react-router-dom';
-import { useAppContext } from '../context/AppContext';
+import { useAppContext } from '../context/AppContext.jsx';
 import { motion } from 'framer-motion';
 
 const FeaturedSection = () => {

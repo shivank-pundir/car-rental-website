@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { assets } from '../assets/assets';
-import Loader from '../component/Loader';
-import { useAppContext } from '../context/AppContext';
+import Loader from '../component/Loader.jsx';
+import { useAppContext } from '../context/AppContext.jsx';
 import axios from 'axios';
 import toast from 'react-hot-toast';
 import { motion } from 'framer-motion';

@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
-import Title from "../component/Title";
-import CarCard from "../component/CarCard";
+import Title from "../component/Title.jsx";
+import CarCard from "../component/CarCard.jsx";
 import { assets } from "../assets/assets";
-import { useAppContext } from "../context/AppContext";
+import { useAppContext } from "../context/AppContext.jsx";
 import { useSearchParams } from "react-router-dom";
 import toast from "react-hot-toast";
 import { motion } from "framer-motion";
