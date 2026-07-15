@@ -1,6 +1,6 @@
 import React from 'react';
 import Hero from '../component/Hero.jsx';
-import FeaturedSection from '../component/featuredSection.jsx';
+import FeaturedSection from '../component/FeaturedSection.jsx';
 import Banner from '../component/Banner.jsx';
 import Testinomial from '../component/Testinomial.jsx';
 import NewsLetter from '../component/NewsLetter.jsx';
